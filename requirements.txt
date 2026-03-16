@@ -1,0 +1,4 @@
+Flask==3.0.0
+earthengine-api==0.1.384
+geemap==0.30.0
+APScheduler==3.10.4
