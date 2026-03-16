@@ -1,4 +1,4 @@
 Flask
 earthengine-api
-geemap
-APScheduler
+apscheduler
+setuptools

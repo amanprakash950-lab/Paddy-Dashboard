@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify
 import ee
-import geemap
+import json 
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
  
@@ -49,7 +49,8 @@ except Exception as e:
 print("Latest Sentinel-1 acquisition:", latest_date)
  
 # ── Convert to GeoJSON ────────────────────────────────────────────────────────
-geojson = geemap.ee_to_geojson(fields_ee)
+geojson = fields_ee.getInfo()
+geojson["type"] = "FeatureCollection"
 print("Number of fields:", len(geojson["features"]))
  
 # ── Assign easy field names AND field_id ─────────────────────────────────────
