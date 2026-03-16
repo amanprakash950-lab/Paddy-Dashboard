@@ -202,6 +202,6 @@ if __name__ == "__main__":
     print("Auto-refresh scheduler started — checks every 6 days")
 
     try:
-        app.run(debug=False)
+        app.run(host='0.0.0.0', port=10000, debug=False)
     except KeyboardInterrupt:
         scheduler.shutdown()
