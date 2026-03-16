@@ -9,6 +9,16 @@ app = Flask(__name__)
 # ── Earth Engine init ──────────────────────────────────────────────────────────
 # FIX 1: Use ee.Initialize directly — Authenticate() is only needed once
 # interactively. Remove it from production startup to avoid blocking the server.
+import os
+import json
+
+creds_json = os.environ.get("EE_CREDENTIALS")
+if creds_json:
+    creds_path = os.path.expanduser("~/.config/earthengine/credentials")
+    os.makedirs(os.path.dirname(creds_path), exist_ok=True)
+    with open(creds_path, "w") as f:
+        f.write(creds_json)
+
 try:
     ee.Initialize(project='pivotal-mode-459101-a1')
     print("Earth Engine connected")
