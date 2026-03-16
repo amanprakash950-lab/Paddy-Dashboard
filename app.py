@@ -157,6 +157,160 @@ def timeseries(field_id):
  
  
 from apscheduler.schedulers.background import BackgroundScheduler
+def recalculate_health():
+    global geojson, latest_date
+
+    print("Recalculating field health from latest Sentinel-1 data...")
+
+    try:
+        paddy_fields = ee.FeatureCollection("users/amanbhatt/alathur_paddy_fields")
+
+        # Assign field_id
+        paddy_fields = paddy_fields.map(
+            lambda f: f.set('field_id', f.id())
+        )
+
+        # Latest Sentinel-1 image
+        s1 = (
+            ee.ImageCollection('COPERNICUS/S1_GRD')
+            .filterBounds(paddy_fields)
+            .filterDate('2023-01-01', datetime.today().strftime("%Y-%m-%d"))
+            .filter(ee.Filter.eq('instrumentMode', 'IW'))
+            .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+            .select('VH')
+        )
+
+        # Speckle filter
+        def speckle_filter(image):
+            vh = image.select('VH').focal_median(30, 'circle', 'meters')
+            return image.addBands(vh.rename('VH'), None, True) \
+                        .copyProperties(image, ['system:time_start'])
+
+        s1_filtered = s1.map(speckle_filter)
+
+        # Latest image
+        latest_image = s1_filtered.sort('system:time_start', False).first()
+        latest_timestamp = latest_image.get('system:time_start').getInfo()
+        new_date = datetime.fromtimestamp(latest_timestamp / 1000).strftime("%d %b %Y")
+
+        # Current VH per field
+        current_fields = latest_image.select('VH').reduceRegions(
+            collection=paddy_fields,
+            reducer=ee.Reducer.mean(),
+            scale=10
+        )
+
+        # Crop stage classification
+        def classify_stage(feature):
+            vh = ee.Number(feature.get('mean'))
+            stage = ee.Algorithms.If(
+                vh.lt(-22), 'Flooded / Sowing',
+                ee.Algorithms.If(
+                    vh.lt(-18), 'Early Growth',
+                    ee.Algorithms.If(
+                        vh.lt(-15), 'Vegetative Growth',
+                        'Peak Biomass'
+                    )
+                )
+            )
+            return feature.set({'VH_value': vh, 'crop_stage': stage})
+
+        classified_fields = current_fields.map(classify_stage)
+
+        # Seasonal baseline (previous 3 years, same day ±7)
+        latest_date_ee = ee.Date(latest_image.get('system:time_start'))
+        latest_year    = latest_date_ee.get('year')
+        doy            = latest_date_ee.getRelative('day', 'year')
+
+        start_year = ee.Number(latest_year).subtract(3)
+        end_year   = ee.Number(latest_year).subtract(1)
+
+        historical = s1.filter(ee.Filter.calendarRange(start_year, end_year, 'year'))
+
+        seasonal_collection = historical.filter(
+            ee.Filter.calendarRange(
+                ee.Number(doy).subtract(7),
+                ee.Number(doy).add(7),
+                'day_of_year'
+            )
+        )
+
+        baseline_seasonal = seasonal_collection.select('VH') \
+            .median() \
+            .reduceRegions(
+                collection=paddy_fields,
+                reducer=ee.Reducer.mean(),
+                scale=10
+            )
+
+        # Health classification
+        def classify_health(feature):
+            field_id = feature.get('field_id')
+
+            baseline_feature = baseline_seasonal \
+                .filter(ee.Filter.eq('field_id', field_id)) \
+                .first()
+
+            baseline_vh = ee.Algorithms.If(
+                baseline_feature,
+                ee.Number(ee.Feature(baseline_feature).get('mean')),
+                -18
+            )
+
+            current_vh = ee.Number(feature.get('VH_value'))
+            delta_vh   = current_vh.subtract(ee.Number(baseline_vh))
+
+            health = ee.Algorithms.If(
+                delta_vh.gt(-0.5), 'Healthy',
+                ee.Algorithms.If(
+                    delta_vh.gt(-2), 'Moderate Stress',
+                    'Low Biomass'
+                )
+            )
+
+            return feature.set({
+                'baseline_VH': baseline_vh,
+                'delta_VH':    delta_vh,
+                'health_status': health
+            })
+
+        health_fields = classified_fields.map(classify_health)
+
+        # Add coordinates
+        def add_coords(feature):
+            centroid = feature.geometry().centroid()
+            coords   = centroid.coordinates()
+            return feature.set({
+                'longitude': coords.get(0),
+                'latitude':  coords.get(1)
+            })
+
+        export_fields = health_fields.map(add_coords)
+
+        # Export updated asset back to GEE
+        task = ee.batch.Export.table.toAsset(
+            collection=export_fields,
+            description='alathur_paddy_health_latest',
+            assetId='users/amanbhatt/alathur_paddy_health_latest'
+        )
+        task.start()
+        print("GEE export task started — asset will update in a few minutes")
+
+        # Update in-memory geojson immediately from fresh calculation
+        new_geojson = export_fields.getInfo()
+        new_geojson["type"] = "FeatureCollection"
+
+        for i, feature in enumerate(new_geojson["features"], start=1):
+            feature["properties"]["field_name"] = f"Field {i}"
+            feature["properties"]["field_id"]   = i
+
+        geojson     = new_geojson
+        latest_date = new_date
+
+        print("Health recalculation complete! Latest date:", latest_date)
+
+    except Exception as e:
+        print("Recalculation error:", e)
 
 def refresh_data():
     global geojson, latest_date
@@ -197,7 +351,7 @@ def refresh_data():
 
 if __name__ == "__main__":
     scheduler = BackgroundScheduler()
-    scheduler.add_job(refresh_data, 'interval', days=6)
+    scheduler.add_job(recalculate_health, 'interval', days=6)
     scheduler.start()
     print("Auto-refresh scheduler started — checks every 6 days")
 
