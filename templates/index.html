@@ -392,7 +392,7 @@ var geoLayer = L.geoJSON(fields, {
 
           var canvas = document.createElement("canvas");
           canvas.width  = 260;
-          canvas.height = 110;
+          canvas.height = 90;
           canvasWrap.appendChild(canvas);
           container.appendChild(canvasWrap);
 
@@ -430,8 +430,8 @@ var geoLayer = L.geoJSON(fields, {
 map.panTo(center, { animate: true, duration: 0.5 });
 
 L.popup({ 
-  maxWidth: 300,
-  maxHeight: 400,
+  maxWidth: 320,
+  maxHeight: 600,
   autoPan: true,
   autoPanPaddingTopLeft: L.point(20, 80),
   autoPanPaddingBottomRight: L.point(20, 20),
@@ -550,7 +550,7 @@ if (!matchedFeature) {
 
       var canvas = document.createElement("canvas");
       canvas.width  = 260;
-      canvas.height = 140;
+      canvas.height = 90;
       canvasWrap.appendChild(canvas);
       container.appendChild(canvasWrap);
 
@@ -591,8 +591,8 @@ if (!matchedFeature) {
 map.panTo(center, { animate: true, duration: 0.5 });
 
 L.popup({ 
-  maxWidth: 300,
-  maxHeight: 400,
+  maxWidth: 320,
+  maxHeight: 600,
   autoPan: true,
   autoPanPaddingTopLeft: L.point(20, 80),
   autoPanPaddingBottomRight: L.point(20, 20),
