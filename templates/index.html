@@ -205,8 +205,8 @@ min-width:260px;
 
 
 .leaflet-popup-content {
-  overflow-y: auto;
-  max-height: 560px;
+  overflow-y: scroll !important;
+  max-height: 500px !important;
   margin: 10px 12px;
   min-width: 360px;
 }
@@ -435,14 +435,11 @@ var geoLayer = L.geoJSON(fields, {
           });
 
           var center = layer.getBounds().getCenter();
-map.panTo(center, { animate: true, duration: 0.5 });
+map.panTo(center, { animate: true, duration: 0.8, offset: [0,-150] });
 
 L.popup({ 
   maxWidth: 420,
-  autoPan: true,
-  autoPanPaddingTopLeft: L.point(20, 120),
-  autoPanPaddingBottomRight: L.point(20, 20),
-  keepInView: true
+  autoPan: false,
 })
   .setLatLng(center)
   .setContent(container)
@@ -595,14 +592,11 @@ if (!matchedFeature) {
       var center = bounds.getCenter();
 
       // Pan map so popup fits fully on screen
-map.panTo(center, { animate: true, duration: 0.5 });
+map.panTo(center, { animate: true, duration: 0.8, offset: [0,-150] });
 
 L.popup({ 
   maxWidth: 420,
-  autoPan: true,
-  autoPanPaddingTopLeft: L.point(20, 120),
-  autoPanPaddingBottomRight: L.point(20, 20),
-  keepInView: true
+  autoPan: false,
 })
   .setLatLng(center)
   .setContent(container)
