@@ -203,6 +203,13 @@ min-width:260px;
 }
 .leaflet-popup-tip{ background:#1e293b !important; }
 
+
+.leaflet-popup-content {
+  overflow-y: auto;
+  max-height: 450px;
+  margin: 10px 12px;
+}
+
 </style>
 
 </head>
@@ -391,8 +398,8 @@ var geoLayer = L.geoJSON(fields, {
           canvasWrap.style.cssText = "width:100%;margin-top:10px;";
 
           var canvas = document.createElement("canvas");
-          canvas.width  = 260;
-          canvas.height = 90;
+          canvas.width  = 220;
+          canvas.height = 80;
           canvasWrap.appendChild(canvas);
           container.appendChild(canvasWrap);
 
@@ -430,10 +437,10 @@ var geoLayer = L.geoJSON(fields, {
 map.panTo(center, { animate: true, duration: 0.5 });
 
 L.popup({ 
-  maxWidth: 320,
-  maxHeight: 600,
+  maxWidth: 340,
+  maxHeight: 500,
   autoPan: true,
-  autoPanPaddingTopLeft: L.point(20, 80),
+  autoPanPaddingTopLeft: L.point(20, 120),
   autoPanPaddingBottomRight: L.point(20, 20),
   keepInView: true
 })
@@ -549,8 +556,8 @@ if (!matchedFeature) {
       canvasWrap.style.cssText = "width:100%;margin-top:10px;";
 
       var canvas = document.createElement("canvas");
-      canvas.width  = 260;
-      canvas.height = 90;
+      canvas.width  = 220;
+      canvas.height = 80;
       canvasWrap.appendChild(canvas);
       container.appendChild(canvasWrap);
 
@@ -591,10 +598,10 @@ if (!matchedFeature) {
 map.panTo(center, { animate: true, duration: 0.5 });
 
 L.popup({ 
-  maxWidth: 320,
-  maxHeight: 600,
+  maxWidth: 340,
+  maxHeight: 500,
   autoPan: true,
-  autoPanPaddingTopLeft: L.point(20, 80),
+  autoPanPaddingTopLeft: L.point(20, 120),
   autoPanPaddingBottomRight: L.point(20, 20),
   keepInView: true
 })
