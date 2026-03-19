@@ -435,11 +435,13 @@ var geoLayer = L.geoJSON(fields, {
           });
 
           var center = layer.getBounds().getCenter();
-map.panTo(center, { animate: true, duration: 0.8, offset: [0,-150] });
+map.panTo(center, { animate: true, duration: 0.8 });
 
 L.popup({ 
   maxWidth: 420,
-  autoPan: false,
+  autoPan: true,
+  autoPanPaddingTopLeft: L.point(10, 200),
+  autoPanPaddingBottomRight: L.point(10, 10)
 })
   .setLatLng(center)
   .setContent(container)
@@ -592,11 +594,13 @@ if (!matchedFeature) {
       var center = bounds.getCenter();
 
       // Pan map so popup fits fully on screen
-map.panTo(center, { animate: true, duration: 0.8, offset: [0,-150] });
+map.panTo(center, { animate: true, duration: 0.8 });
 
 L.popup({ 
   maxWidth: 420,
-  autoPan: false,
+  autoPan: true,
+  autoPanPaddingTopLeft: L.point(10, 200),
+  autoPanPaddingBottomRight: L.point(10, 10)
 })
   .setLatLng(center)
   .setContent(container)
