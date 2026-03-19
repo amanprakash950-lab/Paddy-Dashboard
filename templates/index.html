@@ -382,7 +382,10 @@ var geoLayer = L.geoJSON(fields, {
             "<tr><td style='color:#94a3b8'>Delta VH</td><td style='text-align:right'>" + p.delta_VH.toFixed(2) + "</td></tr>" +
             "<tr><td style='color:#94a3b8'>Stage</td><td style='text-align:right'>" + p.crop_stage + "</td></tr>" +
             "<tr><td style='color:#94a3b8'>Health</td><td style='text-align:right;color:" + getColor(p.health_status) + ";font-weight:700'>" + p.health_status + "</td></tr>" +
-            "</table>";
+"<tr><td style='color:#94a3b8'>Lat</td><td style='text-align:right'>" + p.latitude.toFixed(5) + "</td></tr>" +
+"<tr><td style='color:#94a3b8'>Lon</td><td style='text-align:right'>" + p.longitude.toFixed(5) + "</td></tr>" +
+"</table>" +
+"<a href='https://www.google.com/maps?q=" + p.latitude + "," + p.longitude + "' target='_blank' style='display:block;margin-top:10px;padding:8px;background:#38bdf8;color:#0f172a;text-align:center;border-radius:6px;font-weight:700;text-decoration:none;font-size:13px;'>📍 Open in Google Maps</a>";
 
           var canvasWrap = document.createElement("div");
           canvasWrap.style.cssText = "width:100%;margin-top:10px;";
@@ -536,8 +539,11 @@ if (!matchedFeature) {
         "<tr><td style='color:#94a3b8'>VH</td><td style='text-align:right'>" + p.VH_value.toFixed(2) + " dB</td></tr>" +
         "<tr><td style='color:#94a3b8'>Delta VH</td><td style='text-align:right'>" + p.delta_VH.toFixed(2) + "</td></tr>" +
         "<tr><td style='color:#94a3b8'>Stage</td><td style='text-align:right'>" + p.crop_stage + "</td></tr>" +
-        "<tr><td style='color:#94a3b8'>Health</td><td style='text-align:right;color:" + getColor(p.health_status) + ";font-weight:700'>" + p.health_status + "</td></tr>" +
-        "</table>";
+       "<tr><td style='color:#94a3b8'>Health</td><td style='text-align:right;color:" + getColor(p.health_status) + ";font-weight:700'>" + p.health_status + "</td></tr>" +
+"<tr><td style='color:#94a3b8'>Lat</td><td style='text-align:right'>" + p.latitude.toFixed(5) + "</td></tr>" +
+"<tr><td style='color:#94a3b8'>Lon</td><td style='text-align:right'>" + p.longitude.toFixed(5) + "</td></tr>" +
+"</table>" +
+"<a href='https://www.google.com/maps?q=" + p.latitude + "," + p.longitude + "' target='_blank' style='display:block;margin-top:10px;padding:8px;background:#38bdf8;color:#0f172a;text-align:center;border-radius:6px;font-weight:700;text-decoration:none;font-size:13px;'>📍 Open in Google Maps</a>";
 
       var canvasWrap = document.createElement("div");
       canvasWrap.style.cssText = "width:100%;margin-top:10px;";
