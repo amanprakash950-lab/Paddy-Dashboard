@@ -49,8 +49,17 @@ except Exception as e:
 print("Latest Sentinel-1 acquisition:", latest_date)
  
 # ── Convert to GeoJSON ────────────────────────────────────────────────────────
-geojson = fields_ee.getInfo()
-geojson["type"] = "FeatureCollection"
+import os, json
+
+CACHE_FILE = "/tmp/geojson_cache.json"
+
+if os.path.exists(CACHE_FILE):
+    print("Loading from cache...")
+    with open(CACHE_FILE, "r") as f:
+        geojson = json.load(f)
+else:
+    geojson = fields_ee.getInfo()
+    geojson["type"] = "FeatureCollection"
 print("Number of fields:", len(geojson["features"]))
  
 # ── Assign easy field names AND field_id ─────────────────────────────────────
@@ -308,6 +317,9 @@ def recalculate_health():
             feature["properties"]["field_id"]   = i
 
         geojson     = new_geojson
+        with open(CACHE_FILE, "w") as f:
+         json.dump(geojson, f)
+        print("Cache saved!")
         latest_date = new_date
 
         print("Health recalculation complete! Latest date:", latest_date)
