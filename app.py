@@ -106,7 +106,10 @@ def dashboard():
 @app.route("/data")
 def data():
     return jsonify(geojson)
- 
+@app.route("/refresh")
+def manual_refresh():
+    recalculate_health()
+    return jsonify({"status": "done", "latest_date": latest_date})
  
 @app.route("/timeseries/<int:field_id>")
 def timeseries(field_id):
